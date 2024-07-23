@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import apiHarmSongPublic from "../apis/publicHarmonySong";
 import { SongsType } from "../types/harmony";
+import { useSongsContext } from "../hooks/usePlayerSong";
 
 const fetchSongs = async () => {
   const { data } = await apiHarmSongPublic.get<SongsType[]>(`/songs`);
@@ -18,6 +19,10 @@ function useSongs() {
 }
 function Songs() {
   const { data } = useSongs();
+  const {dispatch} = useSongsContext()
+  const addToPlayer = (song: SongsType) => {
+    dispatch({type: 'SET_SONG', payload: song})
+  }
   return (
     <div className="w-full max-w-96">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
@@ -36,6 +41,7 @@ function Songs() {
               <tr
                 key={song.id}
                 className="hover:bg-myprim-400 transition-colors"
+                onClick={()=>addToPlayer(song)}
               >
                 <td className="px-4 py-2 text-center text-mydark-50 font-light select-none">
                   {index + 1}
