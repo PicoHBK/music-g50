@@ -19,10 +19,14 @@ function useSongs() {
 }
 function Songs() {
   const { data } = useSongs();
-  const {dispatch} = useSongsContext()
+  const { dispatch } = useSongsContext();
   const addToPlayer = (song: SongsType) => {
-    dispatch({type: 'SET_SONG', payload: song})
-  }
+    if (song.song_file) {
+      dispatch({ type: "SET_SONG", payload: song });
+    }else{
+        console.log("Sin File de la Musica por favor agregue una archivo")
+    }
+  };
   return (
     <div className="w-full max-w-96">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
@@ -40,8 +44,8 @@ function Songs() {
             {data?.map((song, index) => (
               <tr
                 key={song.id}
-                className="hover:bg-myprim-400 transition-colors"
-                onClick={()=>addToPlayer(song)}
+                className={song.song_file ? "hover:bg-myprim-400 transition-colors": "bg-opacity-75 bg-myerror-100 cursor-not-allowed"}
+                onClick={() => addToPlayer(song)}
               >
                 <td className="px-4 py-2 text-center text-mydark-50 font-light select-none">
                   {index + 1}
