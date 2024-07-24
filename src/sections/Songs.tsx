@@ -27,11 +27,13 @@ function Songs() {
         console.log("Sin File de la Musica por favor agregue una archivo")
     }
   };
+
+
   return (
-    <div className="w-full max-w-96">
+    <div className="w-full max-w-[700px]">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full text-sm h-80">
           <thead>
             <tr className="bg-myprim-100 text-myprim-900">
               <th className="px-4 py-2 text-center font-normal">#</th>
