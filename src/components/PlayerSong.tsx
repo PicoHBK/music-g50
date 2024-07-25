@@ -64,7 +64,7 @@ const PlayerSong = () => {
   
 
   return (
-    <div className="flex flex-col fixed bottom-0 left-0 w-full bg-myprim-50 p-4 min-h-24 justify-around lg:flex-row">
+    <div className="flex flex-col bottom-0 left-0 w-full bg-myprim-50 p-4 min-h-24 justify-around lg:flex-row mt-auto">
       <section className="flex w-full justify-center items-center gap-2">
         <button onClick={handlePlay} className="w-12 h-12">
           <img
