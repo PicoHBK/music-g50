@@ -2,11 +2,17 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Header from "../components/Header";
+import LateralBar from "../components/LateralBar";
 
 const Layout = () => (
     <>
-      <Header />
-      <Outlet />
+      <section className="flex w-full">
+        <LateralBar />
+        <div className="flex flex-col w-full">
+          <Header />
+          <Outlet />
+        </div>
+      </section>
     </>
   );
 const routers = createBrowserRouter([

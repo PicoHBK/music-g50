@@ -44,7 +44,7 @@ function Header() {
     console.log("onSubmit")
   };
   return (
-    <header className="flex justify-between w-full bg-myprim-200 px-4 font-lato items-center">
+    <header className="flex justify-between w-full px-4 font-lato items-center">
       <form onSubmit={onSubmit} className=" text-myprim-600 w-full text-sm">
         <input
           name="search"
