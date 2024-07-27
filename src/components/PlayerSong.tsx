@@ -7,7 +7,7 @@ const PlayerSong = () => {
   const [mute, setMute] = useState(false);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState(false);
-  const [volume, setVolume] = useState(0.8); 
+  const [volume, setVolume] = useState(0.1); 
 
   const handlePlay = () => {
     setPlaying(!playing);

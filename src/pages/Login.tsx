@@ -33,23 +33,6 @@ function Login() {
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate()
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setMessage("");
-  };
-
-  const submitForm = (e: FormEvent): void => {
-    e.preventDefault();
-    console.log(formData)
-    setLoading(true);
-    mutate(formData)
-  };
-
-
   const { mutate } = useMutation({
     mutationFn: login,
     onMutate: () => {
@@ -70,6 +53,24 @@ function Login() {
       setLoading(false);
     },
   });
+
+  const navigate = useNavigate()
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setMessage("");
+  };
+
+  const submitForm = (e: FormEvent): void => {
+    e.preventDefault();
+    console.log(formData)
+    setLoading(true);
+    mutate(formData)
+  };
+
+
+  
 
   return (
     <form onSubmit={submitForm} className="flex flex-col font-lato gap-3 items-center text-mydark-100">

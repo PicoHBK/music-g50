@@ -30,6 +30,7 @@ export interface SongsType{
     name: string;
     bio?: string;
     website?: string;
+    image?: string;
     owner: number;
-    songs: any[];
+    songs: number[];
   }

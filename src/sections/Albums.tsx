@@ -1,22 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import apiHarmSongPublic from "../apis/publicHarmonySong";
 import AlbumCard from "../components/CardAlbum"
-import { AlbumType } from "../types/harmony";
+import { useAlbums } from "@/hooks/useAlbums";
 
-const fetchAlbums = async () => {
-    const { data } = await apiHarmSongPublic.get<AlbumType[]>(`/albums`);
-    return data;
-}
-
-function useAlbums() {
-    const { data } = useQuery({
-        queryKey: ["albums"],
-        queryFn: fetchAlbums,
-        staleTime: Infinity,
-    });
-
-    return {data}
-}
 
 function Albums() {
     const { data:albums } = useAlbums();

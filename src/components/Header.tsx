@@ -32,12 +32,13 @@ function Header() {
   useEffect(() => {
     if (isSuccess) {
       dispatch({ type: "SET_AUTH", payload: true });
+      dispatch({ type: "SET_USER", payload: user });
     }
     if (isError) {
       dispatch({ type: "SET_AUTH", payload: false });
       localStorage.removeItem("token");
     }
-  }, [isSuccess, isError, dispatch]);
+  }, [isSuccess, isError, dispatch, user]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
