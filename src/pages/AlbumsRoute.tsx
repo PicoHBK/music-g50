@@ -16,6 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CardAlbum from "@/components/CardAlbum";
 import AlbumForm from "@/components/forms/AlbumForm";
 import AlbumEdit from "@/components/forms/AlbumEdit";
+import Songs from "@/sections/Songs";
 
 const deleteArtist = async (id:number) => {
   const token = localStorage.getItem("token")
@@ -70,6 +71,7 @@ function AlbumsRoute() {
               <DialogTitle>{album.title}</DialogTitle>
               <DialogDescription>{album.year}</DialogDescription>
             </DialogHeader>
+            <Songs filterGenRes={"all"} filterAlbum={album.id}/>
             {!edit ?
               <div className="flex flex-col gap-2">
                 {(state.user?.user__id === album.owner && !borrar) && <div className="flex gap-2">

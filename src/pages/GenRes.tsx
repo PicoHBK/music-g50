@@ -30,7 +30,7 @@ function GenRes() {
           }
         </div>
       </div>
-      {gen&&<Songs filter={gen?.id}/>}
+      {gen&&<Songs filterGenRes={gen?.id} filterAlbum={"all"}/>}
       
       
       

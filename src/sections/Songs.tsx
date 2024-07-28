@@ -39,19 +39,28 @@ const deleteSong = async (id:number) => {
 
 
 
-function useSongs(filter:string| number) {
-  const { data } = useQuery({
+function useSongs(filterGenRes:number| string, filterAlbum:number| string) {
+  const { data, isLoading, error } = useQuery({
     queryKey: ["songs"],
     queryFn: fetchSongs,
     staleTime: Infinity,
   });
 
-  const filterSongs = filter !== "all" ? data?.filter((song) => song.genres.includes(filter)) : data
+  let filteredSongs = data;
 
-  return { data:filterSongs };
+  if (!isLoading && !error && data) {
+    if (filterGenRes !== "all") {
+      filteredSongs = filteredSongs?.filter((song) => song.genres.includes(filterGenRes));
+    }
+    if (filterAlbum !== "all") {
+      filteredSongs = filteredSongs?.filter((song) => song.album === filterAlbum);
+    }
+  }
+
+  return { data: filteredSongs, isLoading, error };
 }
-function Songs({filter="all"}:{filter:string | number}) {
-  const { data } = useSongs(filter);
+function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | number,filterAlbum:string | number}) {
+  const { data } = useSongs(filterGenRes, filterAlbum);
   const { dispatch } = useSongsContext();
   const { state } = useAuthContext();
   const [showDialog, setShowDialog] = useState(false);

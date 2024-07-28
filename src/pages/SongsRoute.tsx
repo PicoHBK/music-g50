@@ -12,7 +12,7 @@ import {
 function SongsRoute() {
   return (
     <div className="flex w-full">
-      <Songs filter="all" />
+      <Songs filterGenRes="all" filterAlbum="all" />
       <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">

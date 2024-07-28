@@ -15,6 +15,8 @@ import { useAuthContext } from "@/hooks/useAuth";
 import { useState } from "react";
 import apiHarmSongPublic from "@/apis/publicHarmonySong";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAlbums } from "@/hooks/useAlbums";
+import AlbumCard from "@/components/CardAlbum";
 
 const deleteArtist = async (id:number) => {
   const token = localStorage.getItem("token")
@@ -54,6 +56,8 @@ function ArtistsRoute() {
     },
   });
 
+  const {data:albums} = useAlbums();
+
   const confirmDeleteArtist = (id: number) => {
     mutate(id);
     setBorrar(false)
@@ -68,22 +72,34 @@ function ArtistsRoute() {
             <CardArtist artist={artist}/>
           </DialogTrigger>
           <DialogContent>
+            
             <DialogHeader>
-              <DialogTitle>Artista</DialogTitle>
-              <DialogDescription>Info</DialogDescription>
+              <DialogTitle>{artist.name}</DialogTitle>
+              <DialogDescription>{artist.bio}</DialogDescription>
             </DialogHeader>
+            {!edit&&<div className="flex flex-wrap gap-2 items-start">
+              {
+                albums?.filter((album) => album.artist=== artist.id).map((album) => (
+                  <div className="flex flex-col max-w-24 hover:scale-105 transition">
+                    <div className="w-16 h-24 text-center">
+                      <img src={album.cover || "https://wallpaper.forfun.com/fetch/02/02d248d9eeaf7c12258f6ea6e1d445c1.jpeg?h=900&r=0.5"} alt="album" className="w-full h-full object-cover rounded-lg" />
+
+                    </div>
+                    <p className="text-sm font-semibold text-myprim-800">{album.year}</p>
+                  </div>
+                ))
+              }
+
+            </div>}
             {!edit ?
               <div className="flex flex-col gap-2">
-                <h3 className="text-myprim-600 font-bold text-2xl border-b-[1px] border-gray-600">{artist.name}</h3>
-                <p className="text-gray-700 font-semibold text-sm">Biografia</p>
-                <p className="text-gray-500 font-semibold text-sm">{artist.bio}</p>
                 <a href={artist.website} className="text-mysec-500 font-bold text-sm" >Web</a>
                 {(state.user?.user__id === artist.owner && !borrar) && <div className="flex gap-2">
                   <button className="bg-mywarn-500 py-1 px-3 text-mywarn-100 rounded-lg hover:scale-105 transition" onClick={() => setEdit(true)}>Editar</button>
                   <button className="bg-myerror-500 py-1 px-3 text-myerror-100 rounded-lg hover:scale-105 transition" onClick={() => setBorrar(true)}>Borrar</button>
                 </div>}
               </div>
-            :<ArtistEdit artist={artist} />}
+            :<ArtistEdit artist={artist}/>}
             {borrar && <div className="flex flex-col gap-2 items-center">
               <p>Seguro quieres eliminar el artista permanentemente?</p>
               {!loading ? <button 
