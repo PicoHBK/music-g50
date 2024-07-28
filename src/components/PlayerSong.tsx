@@ -1,6 +1,7 @@
 import { useState, useRef, ChangeEvent } from "react";
 import { useSongsContext } from "../hooks/usePlayerSong";
 import ReactPlayer, { ReactPlayerProps } from "react-player";
+import { useArtists } from "@/hooks/useArtists";
 
 const PlayerSong = () => {
   const [playing, setPlaying] = useState(true);
@@ -40,6 +41,7 @@ const PlayerSong = () => {
   const playerRef = useRef<ReactPlayer | null>(null);
   const [played, setPlayed] = useState(0);
   const [duration, setDuration] = useState(0);
+  const {data:artists} = useArtists() 
 
   const handleProgress: ReactPlayerProps["onProgress"] = (state) => {
     setPlayed(state.played);
@@ -75,7 +77,12 @@ const PlayerSong = () => {
         </button>
         <div className="flex flex-col">
           <p className="text-sm font-bold">{state.song?.title}</p>
-          <p className="text-sm font-normal">Artista</p>
+          {
+            artists?.map((artist) => (
+              state.song?.artists.includes(artist.id) && <p className="text-sm font-normal">{artist.name}</p>
+
+            ))
+            }
         </div>
         <ReactPlayer
           ref={playerRef}

@@ -8,13 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAuthContext } from "@/hooks/useAuth";
 
 function SongsRoute() {
-  const {state} = useAuthContext()
   return (
     <div className="flex w-full">
-      <Songs />
+      <Songs filter="all" />
       <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">

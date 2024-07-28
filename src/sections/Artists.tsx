@@ -1,22 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useArtists } from "@/hooks/useArtists";
 import CardArtist from "../components/CardArtist"
-import { ArtistType } from "../types/harmony";
-import apiHarmSongPublic from "../apis/publicHarmonySong";
 
-const fetchArtists = async () => {
-    const { data } = await apiHarmSongPublic.get<ArtistType[]>(`/artists`);
-    return data;
-}
-
-function useArtists() {
-    const { data } = useQuery({
-        queryKey: ["artist"],
-        queryFn: fetchArtists,
-        staleTime: Infinity,
-    });
-
-    return {data}
-}
 
 function Artists() {
     const {data:artists} = useArtists();

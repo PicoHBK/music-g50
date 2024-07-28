@@ -20,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import SongEdit from "@/components/forms/SongEdit";
 
 const fetchSongs = async () => {
   const { data } = await apiHarmSongPublic.get<SongsType[]>(`/songs`);
@@ -38,18 +39,19 @@ const deleteSong = async (id:number) => {
 
 
 
-function useSongs() {
+function useSongs(filter:string| number) {
   const { data } = useQuery({
     queryKey: ["songs"],
     queryFn: fetchSongs,
     staleTime: Infinity,
   });
 
+  const filterSongs = filter !== "all" ? data?.filter((song) => song.genres.includes(filter)) : data
 
-  return { data };
+  return { data:filterSongs };
 }
-function Songs() {
-  const { data } = useSongs();
+function Songs({filter="all"}:{filter:string | number}) {
+  const { data } = useSongs(filter);
   const { dispatch } = useSongsContext();
   const { state } = useAuthContext();
   const [showDialog, setShowDialog] = useState(false);
@@ -90,7 +92,7 @@ function Songs() {
     <div className="w-full max-w-[700px]">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm h-80">
+        <table className="w-full text-sm">
           <thead>
             <tr className="bg-myprim-100 text-myprim-900">
               <th className="px-4 py-2 text-center font-normal">#</th>
@@ -144,14 +146,13 @@ function Songs() {
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>
-                                Are you absolutely sure?
+                                Editar
                               </DialogTitle>
                               <DialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your account and remove your
-                                data from our servers.
+                                Solo puedes editar tus canciones
                               </DialogDescription>
                             </DialogHeader>
+                            <SongEdit song={song}/>
                           </DialogContent>
                         </Dialog>
                         <Dialog open={showDialog}>

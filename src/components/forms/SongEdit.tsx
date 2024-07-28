@@ -1,23 +1,20 @@
 import apiHarmSongPrivate from "@/apis/privateHarmonySong";
 import { useAlbums } from "@/hooks/useAlbums";
-import { useArtists } from "@/hooks/useArtists";
 import { useAuthContext } from "@/hooks/useAuth";
-import { useGenRes } from "@/hooks/useGenRes";
 import { SongsType } from "@/types/harmony";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 interface FormData {
-  title: string;
-  year: number;
-  duration: number;
-  song_file: File | null;
-  album: number | null;
-  artist: number[];
-  genre: number[] | null;
-}
+    id: number;
+    title: string;
+    year: number;
+    duration: number;
+    song_file: File | null;
+    album: number | null;
+  }
 
-const postSong = (formData: FormData) => {
+const putSong = (formData: FormData) => {
   const token = localStorage.getItem("token");
   const data = new FormData();
 
@@ -30,33 +27,14 @@ const postSong = (formData: FormData) => {
   }
 
   return apiHarmSongPrivate
-    .post<SongsType>("/harmonyhub/songs/", data, {
+    .put<SongsType>(`/harmonyhub/songs/${formData.id}`, data, {
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "multipart/form-data",
       },
     })
     .then((response) => {
-      formData.artist.forEach((id_artist) => {apiHarmSongPrivate.post("/harmonyhub/song-artists/", {
-        role: "Vocalista",
-        song: response.data.id,
-        artist: id_artist
-      },{
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });})
-
-      formData.genre?.forEach((id_genre)=>{apiHarmSongPrivate.post("/harmonyhub/song-genres/", {
-        song: response.data.id,
-        genre: id_genre
-      },{
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });}
-)
-
+        
       return response.data;
     })
     .catch((error) => {
@@ -64,15 +42,14 @@ const postSong = (formData: FormData) => {
     });
 };
 
-const SongForm = () => {
+function SongEdit({ song }: { song: SongsType }) {
   const [formData, setFormData] = useState<FormData>({
-    title: "",
-    year: 0,
-    duration: 0,
+    id: song.id,
+    title: song.title,
+    year: song.year || 0,
+    duration: song.duration || 0,
     song_file: null,
-    album: null,
-    artist: [],
-    genre: [],
+    album: song.album || null,
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -80,7 +57,7 @@ const SongForm = () => {
   const { state } = useAuthContext();
 
   const { mutate, isSuccess } = useMutation({
-    mutationFn: postSong,
+    mutationFn: putSong,
     onMutate: () => {
       console.log("Mandando la song");
     },
@@ -95,9 +72,7 @@ const SongForm = () => {
     },
   });
 
-  const {data: albums } = useAlbums();
-  const {data:artists } = useArtists();
-  const {data:genres} = useGenRes()
+  const { data: albums } = useAlbums();
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -137,65 +112,78 @@ const SongForm = () => {
           className="flex flex-col font-lato gap-3 items-center text-mydark-100"
           encType="multipart/form-data"
         >
+          <label
+            htmlFor="title"
+            className="block font-semibold mb-1 text-sm text-myprim-600"
+          >
+            Título
+          </label>
           <input
+            id="title"
             name="title"
             type="text"
+            value={formData.title}
             maxLength={50}
-            placeholder="Titulo"
+            placeholder="Título"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
             disabled={loading}
           />
+
+          <label
+            htmlFor="year"
+            className="block font-semibold mb-1 text-sm text-myprim-600"
+          >
+            Año
+          </label>
           <input
+            id="year"
             name="year"
             type="number"
             max={2147483647}
+            value={formData.year}
             placeholder="Año"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
             disabled={loading}
           />
+
+          <label
+            htmlFor="duration"
+            className="block font-semibold mb-1 text-sm text-myprim-600"
+          >
+            Duración
+          </label>
           <input
+            id="duration"
             name="duration"
             type="number"
             max={2147483647}
-            placeholder="Duracion?"
+            placeholder="Duración"
+            value={formData.duration}
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            onChange={handleChange}
-            disabled={loading}
-          />
-          <input
-            name="song_file"
-            type="file"
-            className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            placeholder="File"
             onChange={handleChange}
             disabled={loading}
           />
 
-          <select
-            name="artist"
-            className=" px-3 py-2 rounded-sm font-semibold"
-            onChange={handleChange}
-            disabled={loading}
-            multiple
+          <label
+            htmlFor="album"
+            className="block font-semibold mb-1 text-sm text-myprim-600"
           >
-            {artists
-              ?.filter((artist) => artist.owner === state.user?.user__id)
-              .map((artist) => (
-                <option key={artist.id} value={artist.id}>
-                  {artist.name}
-                </option>
-              ))}
-          </select>
-
+            Álbum
+          </label>
           <select
+            id="album"
             name="album"
-            className=" px-3 py-2 rounded-sm font-semibold"
+            className="px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
             disabled={loading}
           >
-            <option value={""}>Sin Album</option>
+            <option
+              value={albums?.find((Album) => Album.id === song.album)?.id}
+            >
+              {albums?.find((Album) => Album.id === song.album)?.title}
+            </option>
             {albums
               ?.filter((album) => album.owner === state.user?.user__id)
               .map((album) => (
@@ -205,28 +193,27 @@ const SongForm = () => {
               ))}
           </select>
 
-          <select
-            name="genre"
-            className=" px-3 py-2 rounded-sm font-semibold"
+          <label
+            htmlFor="song_file"
+            className="block font-semibold mb-1 text-sm text-myprim-600"
+          >
+            Archivo de Canción
+          </label>
+          <input
+            id="song_file"
+            name="song_file"
+            type="file"
+            className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
             disabled={loading}
-            multiple
-          >
-            {genres
-              ?.filter((genre) => genre.owner === state.user?.user__id)
-              .map((genre) => (
-                <option key={genre.id} value={genre.id}>
-                  {genre.name}
-                </option>
-              ))}
-          </select>
+          />
 
           {!loading ? (
             <button
               type="submit"
-              className="inline bg-myprim-600 text-myprim-200 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
+              className="inline bg-mywarn-500 text-mywarn-100 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
             >
-              Agregar
+              Editar
             </button>
           ) : (
             <div className="w-10 h-10">
@@ -246,6 +233,6 @@ const SongForm = () => {
       )}
     </>
   );
-};
+}
 
-export default SongForm;
+export default SongEdit;

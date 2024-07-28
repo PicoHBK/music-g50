@@ -34,3 +34,13 @@ export interface SongsType{
     owner: number;
     songs: number[];
   }
+
+  export interface GenResType {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    name: string;
+    description: string;
+    owner: number;
+    songs: number[];
+  }
