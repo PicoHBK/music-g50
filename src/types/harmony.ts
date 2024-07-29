@@ -44,3 +44,34 @@ export interface SongsType{
     owner: number;
     songs: number[];
   }
+
+  export interface PlayListType {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    name: string;
+    description: string;
+    public: boolean;
+    owner: number;
+    entries: number[];
+  }
+
+  export interface PlayListEntry {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    order: number;
+    playlist: number;
+    song: number;
+    owner: number;
+  }
+
+  export interface GenResType {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    name: string;
+    description: string;
+    owner: number;
+    songs: number[];
+  }

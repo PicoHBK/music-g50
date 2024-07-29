@@ -229,7 +229,7 @@ function SongEdit({ song }: { song: SongsType }) {
           )}
         </form>
       ) : (
-        <p>Cargado</p>
+        <p className="text-mysuccess-500 bg-mysuccess-100 p-2 rounded-lg text-center font-semibold text-lg">Canción editada con éxito</p>
       )}
     </>
   );

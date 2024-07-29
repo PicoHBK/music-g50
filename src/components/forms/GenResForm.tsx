@@ -1,31 +1,20 @@
 import apiHarmSongPrivate from "@/apis/privateHarmonySong";
-import { ArtistType } from "@/types/harmony";
+import { GenResType } from "@/types/harmony";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 interface FormData {
   name: string;
-  bio?: string;
-  website?: string;
-  image?: File | null;
+  description: string;
 }
 
-const postArtist = (formData: FormData) => {
+const postGenRes = (formData: FormData) => {
   const token = localStorage.getItem("token");
-  const data = new FormData();
-
-  data.append("name", formData.name);
-  formData.bio && data.append("bio", formData.bio);
-  formData.website && data.append("website", formData.website);
-  if (formData.image) {
-    data.append("image", formData.image);
-  }
 
   return apiHarmSongPrivate
-    .post<ArtistType>("/harmonyhub/artists/", data, {
+    .post<GenResType>("/harmonyhub/genres/", formData, {
       headers: {
         Authorization: `Token ${token}`,
-        "Content-Type": "multipart/form-data",
       },
     })
     .then((response) => {
@@ -35,28 +24,25 @@ const postArtist = (formData: FormData) => {
       return error;
     });
 };
-function ArtistForm() {
+function GenResForm() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    bio: "",
-    website: "",
-    image: null,
+    description: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
 
   const { mutate, isSuccess } = useMutation({
-    mutationFn: postArtist,
+    mutationFn: postGenRes,
     onMutate: () => {
-      console.log("Mandando el artista");
+      console.log("Mandando el GenRes");
       setLoading(true);
     },
     onSuccess: (data) => {
-      console.log("ON SUCCESS Artists");
+      console.log("ON SUCCESS Gen");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: ["albums"] });
       if (data.code === "ERR_BAD_REQUEST") {
         setMessage("Algo salio mal");
       }
@@ -64,30 +50,23 @@ function ArtistForm() {
     },
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-  
-    if (type === "file") {
-      const target = e.target as HTMLInputElement;
-      if (target.files) {
-        setFormData({ ...formData, [name]: target.files[0] });
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
     setMessage("");
   };
 
   const submitForm = (e: FormEvent): void => {
     e.preventDefault();
     console.log(formData);
-    if(formData.name.length >  0){
+    if (formData.name.length > 0 && formData.description.length > 0) {
       mutate(formData);
-    }else{
-      setMessage("Nombre del artista es obligatorio");
+    } else {
+      setMessage("Por favor ponga un titulo y descripción validos");
     }
-    
   };
 
   return (
@@ -101,33 +80,19 @@ function ArtistForm() {
           <input
             name="name"
             type="text"
+            value={formData.name}
             maxLength={50}
-            placeholder="Nombre"
+            placeholder="Título"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            onChange={handleChange}
-            disabled={loading}
-          />
-          <textarea
-            name="bio"
-            rows={4}
-            cols={50}
-            placeholder="Biografía"
-            className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            onChange={handleChange}
-            disabled={loading}
-          />
-          <input
-            name="website"
-            type="url"
-            className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            placeholder="Web"
             onChange={handleChange}
             disabled={loading}
           />
 
-          <input
-            name="image"
-            type="file"
+          <textarea
+            name="description"
+            rows={4}
+            cols={50}
+            placeholder="Descripción"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
             disabled={loading}
@@ -136,9 +101,9 @@ function ArtistForm() {
           {!loading ? (
             <button
               type="submit"
-              className="inline bg-myprim-600 text-myprim-200 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
+              className="inline bg-mywarn-500 text-mywarn-100 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
             >
-              Crear
+              Crear Genero
             </button>
           ) : (
             <div className="w-10 h-10">
@@ -154,10 +119,12 @@ function ArtistForm() {
           )}
         </form>
       ) : (
-        <p className="text-mysuccess-600 bg-mysuccess-200 p-2 rounded-lg text-center font-semibold text-lg">Artista creado con éxito</p>
+        <p className="text-mysuccess-600 bg-mysuccess-200 p-2 rounded-lg text-center font-semibold text-lg">
+          Genero creado con éxito
+        </p>
       )}
     </>
   );
 }
 
-export default ArtistForm;
+export default GenResForm;

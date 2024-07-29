@@ -11,7 +11,8 @@ export function useAlbums() {
         queryKey: ["albums"],
         queryFn: fetchAlbums,
         staleTime: Infinity,
-    });
+    });7
+    
 
     return {data}
 }

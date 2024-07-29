@@ -83,6 +83,7 @@ const SongForm = () => {
     mutationFn: postSong,
     onMutate: () => {
       console.log("Mandando la song");
+      setLoading(true);
     },
     onSuccess: (data) => {
       console.log("ON SUCCESS SONG");
@@ -125,8 +126,12 @@ const SongForm = () => {
   const submitForm = (e: FormEvent): void => {
     e.preventDefault();
     console.log(formData);
-    setLoading(true);
-    mutate(formData);
+    if(formData.title.length > 0){
+      mutate(formData);
+    }else{
+      setMessage("El título es obligatorio")
+    }
+   
   };
 
   return (
@@ -242,7 +247,7 @@ const SongForm = () => {
           )}
         </form>
       ) : (
-        <p>Cargado</p>
+        <p className="text-mysuccess-500 bg-mysuccess-100 p-2 rounded-lg text-center font-semibold text-lg">Canción creada con éxito</p>
       )}
     </>
   );

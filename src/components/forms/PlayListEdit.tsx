@@ -1,33 +1,20 @@
-import apiHarmSongPrivate from "@/apis/privateHarmonySong";
-import { useAuthContext } from "@/hooks/useAuth";
-import { ArtistType } from "@/types/harmony";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChangeEvent, FormEvent, useState } from "react";
-
+import apiHarmSongPrivate from '@/apis/privateHarmonySong';
+import { PlayListType } from '@/types/harmony'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, FormEvent, useState } from 'react';
 interface FormData {
-    id: number | null;
+    id: number
     name: string;
-    bio?: string;
-    website?: string;
-    image?: File | null;
+    description: string | null;
+    public: boolean;
   }
   
-  const postArtist = (formData: FormData) => {
+  const putPlayList = (formData: FormData) => {
     const token = localStorage.getItem("token");
-    const data = new FormData();
-  
-    data.append("name", formData.name);
-    formData.bio && data.append("bio", formData.bio);
-    formData.website && data.append("website", formData.website);
-    if (formData.image) {
-      data.append("image", formData.image);
-    }
-  
     return apiHarmSongPrivate
-      .put<ArtistType>(`/harmonyhub/artists/${formData.id}`, data, {
+      .put<PlayListType>(`/harmonyhub/playlists/${formData.id}`, formData, {
         headers: {
           Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data",
         },
       })
       .then((response) => {
@@ -37,31 +24,28 @@ interface FormData {
         return error;
       });
   };
-function ArtistEdit({artist}: {artist: ArtistType}) {
+
+function PlayListEdit({playlist}:{playlist:PlayListType}) {
     const [formData, setFormData] = useState<FormData>({
-        id: artist.id,
-        name: artist.name,
-        bio: artist.bio || "",
-        website: artist.website|| "",
-        image: null,
+        id:playlist.id,
+        name: playlist.name,
+        description: playlist.description,
+        public: playlist.public,
       });
     
       const [loading, setLoading] = useState(false);
       const [message, setMessage] = useState("");
       const queryClient = useQueryClient();
-
-      const {state} = useAuthContext()
     
       const { mutate, isSuccess } = useMutation({
-        mutationFn: postArtist,
+        mutationFn: putPlayList,
         onMutate: () => {
-          console.log("Mandando artista editado");
-          setLoading(true);
+          console.log("Mandando la playlist");
         },
         onSuccess: (data) => {
-          console.log("ON SUCCESS Artists");
+          console.log("ON SUCCESS Play List");
           console.log(JSON.stringify(data));
-          queryClient.invalidateQueries({ queryKey: ["artists"] });
+          queryClient.invalidateQueries({ queryKey: ["playlists"] });
           if (data.code === "ERR_BAD_REQUEST") {
             setMessage("Algo salio mal");
           }
@@ -70,32 +54,26 @@ function ArtistEdit({artist}: {artist: ArtistType}) {
       });
     
       const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
+        const { name, type, value } = e.target;
+        let newValue: string | boolean = value;
       
-        if (type === "file") {
-          const target = e.target as HTMLInputElement;
-          if (target.files) {
-            setFormData({ ...formData, [name]: target.files[0] });
-          }
-        } else {
-          setFormData({ ...formData, [name]: value });
+        if (type === 'checkbox') {
+          newValue = (e.target as HTMLInputElement).checked;
         }
       
+        setFormData({ ...formData, [name]: newValue });
+        
         setMessage("");
       };
-      
     
       const submitForm = (e: FormEvent): void => {
         e.preventDefault();
-    console.log(formData);
-    if(formData.name.length >  0){
-      mutate(formData);
-    }else{
-      setMessage("Nombre del artista es obligatorio");
-    }
+        console.log(formData);
+        setLoading(true);
+        mutate(formData);
       };
-  return (
-    <>
+    
+      return <>
       {!isSuccess ? (
         <form
           onSubmit={submitForm}
@@ -110,42 +88,36 @@ function ArtistEdit({artist}: {artist: ArtistType}) {
             placeholder="Nombre"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
-            disabled={(loading || state.user?.user__id !== artist.owner)}
+            disabled={loading}
           />
           <textarea
-            name="bio"
+            name="description"
             rows={4}
             cols={50}
-            value={formData.bio}
+            value={formData.description || ""}
             placeholder="Biografía"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
             onChange={handleChange}
-            disabled={(loading || state.user?.user__id !== artist.owner)}
+            disabled={loading}
           />
+    
+        <label>
+            PlayList Publica
+        </label>
           <input
-            name="website"
-            type="url"
+            name="public"
+            type="checkbox"
             className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            value={formData.website}
-            placeholder="Web"
             onChange={handleChange}
-            disabled={(loading || state.user?.user__id !== artist.owner)}
+            disabled={loading}
           />
-
-          {state.user?.user__id === artist.owner && <input
-            name="image"
-            type="file"
-            className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-            onChange={handleChange}
-            disabled={(loading)}
-          />}
-
+    
           {!loading ? (
             <button
               type="submit"
               className="inline bg-myprim-600 text-myprim-200 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
             >
-              Editar
+              Editar PlayList
             </button>
           ) : (
             <div className="w-10 h-10">
@@ -161,10 +133,9 @@ function ArtistEdit({artist}: {artist: ArtistType}) {
           )}
         </form>
       ) : (
-        <p className="text-mysuccess-500 bg-mysuccess-100 p-2 rounded-lg text-center font-semibold text-lg">Artista editado con éxito</p>
+        <p className="text-mysuccess-400 bg-mysuccess-50 p-2 rounded-lg text-center font-semibold text-lg">PlayList editada con éxito</p>
       )}
-    </>
-  )
+    </>;
 }
 
-export default ArtistEdit
+export default PlayListEdit

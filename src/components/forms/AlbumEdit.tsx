@@ -6,94 +6,96 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 interface FormData {
-    id: number;
-    title: string;
-    year: number | null;
-    artist: number | null;
-    cover: File | null;
+  id: number;
+  title: string;
+  year: number | null;
+  artist: number | null;
+  cover: File | null;
+}
+
+const putAlbum = (formData: FormData) => {
+  const token = localStorage.getItem("token");
+  const data = new FormData();
+
+  data.append("title", formData.title);
+  formData.year && data.append("year", formData.year.toString());
+  formData.artist && data.append("artist", formData.artist.toString());
+  if (formData.cover) {
+    data.append("cover", formData.cover);
   }
 
-  const putAlbum = (formData: FormData) => {
-    const token = localStorage.getItem("token");
-    const data = new FormData();
-  
-    data.append("title", formData.title);
-    formData.year && data.append("year", formData.year.toString());
-    formData.artist && data.append("artist", formData.artist.toString());
-    if (formData.cover) {
-      data.append("cover", formData.cover);
+  return apiHarmSongPrivate
+    .put<AlbumType>(`/harmonyhub/albums/${formData.id}`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
+function AlbumEdit({ album }: { album: AlbumType }) {
+  const [formData, setFormData] = useState<FormData>({
+    id: album.id,
+    title: album.title,
+    year: album.year || null,
+    artist: album.artist || null,
+    cover: null,
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const queryClient = useQueryClient();
+  const { state } = useAuthContext();
+
+  const { mutate, isSuccess } = useMutation({
+    mutationFn: putAlbum,
+    onMutate: () => {
+      console.log("Mandando el album editado");
+      setLoading(true);
+    },
+    onSuccess: (data) => {
+      console.log("ON SUCCESS SONG");
+      console.log(JSON.stringify(data));
+      queryClient.invalidateQueries({ queryKey: ["albums"] });
+      if (data.code === "ERR_BAD_REQUEST") {
+        setMessage("Algo salio mal");
+      }
+      setLoading(false);
+    },
+  });
+
+  const { data: artists } = useArtists();
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+
+    if (type === "file") {
+      const target = e.target as HTMLInputElement;
+      if (target.files) {
+        setFormData({ ...formData, [name]: target.files[0] });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
-  
-    return apiHarmSongPrivate
-      .put<AlbumType>(`/harmonyhub/albums/${formData.id}`, data, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return error;
-      });
+
+    setMessage("");
   };
-function AlbumEdit({album}: {album:AlbumType}) {
 
-    const [formData, setFormData] = useState<FormData>({
-        id: album.id,
-        title: album.title,
-        year:  album.year || null,
-        artist: album.artist || null,
-        cover: null,
-      });
-      const [loading, setLoading] = useState(false);
-      const [message, setMessage] = useState("");
-      const queryClient = useQueryClient();
-      const { state } = useAuthContext();
-    
-      const { mutate, isSuccess } = useMutation({
-        mutationFn: putAlbum,
-        onMutate: () => {
-          console.log("Mandando el album");
-        },
-        onSuccess: (data) => {
-          console.log("ON SUCCESS SONG");
-          console.log(JSON.stringify(data));
-          queryClient.invalidateQueries({ queryKey: ["albums"] });
-          if (data.code === "ERR_BAD_REQUEST") {
-            setMessage("Algo salio mal");
-          }
-          setLoading(false);
-        },
-      });
-
-      const {data:artists} = useArtists()
-    
-    
-      const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-      ) => {
-        const { name, value, type } = e.target;
-    
-        if (type === "file") {
-          const target = e.target as HTMLInputElement;
-          if (target.files) {
-            setFormData({ ...formData, [name]: target.files[0] });
-          }
-        } else {
-          setFormData({ ...formData, [name]: value });
-        }
-    
-        setMessage("");
-      };
-    
-      const submitForm = (e: FormEvent): void => {
-        e.preventDefault();
-        console.log(formData);
-        setLoading(true);
-        mutate(formData);
-      };
+  const submitForm = (e: FormEvent): void => {
+    e.preventDefault();
+    console.log(formData);
+    if (formData.title.length > 0 && formData.artist) {
+      mutate(formData);
+    } else {
+      setMessage("Por favor ponga un titulo");
+    }
+  };
 
   return (
     <>
@@ -103,7 +105,6 @@ function AlbumEdit({album}: {album:AlbumType}) {
           className="flex flex-col font-lato gap-3 items-center text-mydark-100"
           encType="multipart/form-data"
         >
-          
           <input
             name="title"
             type="text"
@@ -115,7 +116,6 @@ function AlbumEdit({album}: {album:AlbumType}) {
             disabled={loading}
           />
 
-          
           <input
             name="year"
             type="number"
@@ -141,7 +141,6 @@ function AlbumEdit({album}: {album:AlbumType}) {
             disabled={loading}
             value={formData.artist || ""}
           >
-            <option value="">Sin artista</option>
             {artists
               ?.filter((artist) => artist.owner === state.user?.user__id)
               .map((artist) => (
@@ -187,10 +186,12 @@ function AlbumEdit({album}: {album:AlbumType}) {
           )}
         </form>
       ) : (
-        <p>Cargado</p>
+        <p className="text-mysuccess-400 bg-mysuccess-100 p-2 rounded-lg text-center font-semibold text-lg">
+          Album editado con éxito
+        </p>
       )}
     </>
-  )
+  );
 }
 
-export default AlbumEdit
+export default AlbumEdit;

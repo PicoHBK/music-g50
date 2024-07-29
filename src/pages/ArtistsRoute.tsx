@@ -16,7 +16,6 @@ import { useState } from "react";
 import apiHarmSongPublic from "@/apis/publicHarmonySong";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAlbums } from "@/hooks/useAlbums";
-import AlbumCard from "@/components/CardAlbum";
 
 const deleteArtist = async (id:number) => {
   const token = localStorage.getItem("token")
@@ -53,6 +52,7 @@ function ArtistsRoute() {
       if(data.code === "ERR_BAD_REQUEST"){
         console.log("Algo salio mal")
       }
+      setLoading(false);
     },
   });
 
@@ -80,7 +80,7 @@ function ArtistsRoute() {
             {!edit&&<div className="flex flex-wrap gap-2 items-start">
               {
                 albums?.filter((album) => album.artist=== artist.id).map((album) => (
-                  <div className="flex flex-col max-w-24 hover:scale-105 transition">
+                  <div className="flex flex-col max-w-24 hover:scale-105 transition" key={album.id}>
                     <div className="w-16 h-24 text-center">
                       <img src={album.cover || "https://wallpaper.forfun.com/fetch/02/02d248d9eeaf7c12258f6ea6e1d445c1.jpeg?h=900&r=0.5"} alt="album" className="w-full h-full object-cover rounded-lg" />
 

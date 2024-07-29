@@ -17,6 +17,7 @@ import CardAlbum from "@/components/CardAlbum";
 import AlbumForm from "@/components/forms/AlbumForm";
 import AlbumEdit from "@/components/forms/AlbumEdit";
 import Songs from "@/sections/Songs";
+import { useArtists } from "@/hooks/useArtists";
 
 const deleteArtist = async (id:number) => {
   const token = localStorage.getItem("token")
@@ -30,6 +31,7 @@ const deleteArtist = async (id:number) => {
 
 function AlbumsRoute() {
   const {data:albums} = useAlbums()
+  const {data:artists} = useArtists()
   const {state} = useAuthContext()
   const [edit, setEdit] = useState(false)
   const [borrar, setBorrar] = useState(false)
@@ -71,7 +73,7 @@ function AlbumsRoute() {
               <DialogTitle>{album.title}</DialogTitle>
               <DialogDescription>{album.year}</DialogDescription>
             </DialogHeader>
-            <Songs filterGenRes={"all"} filterAlbum={album.id}/>
+            {(!edit&&!borrar)&&<Songs filterGenRes={"all"} filterAlbum={album.id} filterPlayList={"all"}/>}
             {!edit ?
               <div className="flex flex-col gap-2">
                 {(state.user?.user__id === album.owner && !borrar) && <div className="flex gap-2">
@@ -102,14 +104,15 @@ function AlbumsRoute() {
               className="w-full h-full object-fill"
             />
           </div>
-          <p className="text-myprim-800">Agregar Artista</p>
+          <p className="text-myprim-800">Agregar Album</p>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nuevo Album</DialogTitle>
-            <DialogDescription>Si no tiene artista no elija nada</DialogDescription>
+            <DialogDescription>Llene todo los campos</DialogDescription>
           </DialogHeader>
-          <AlbumForm />
+          {(artists && artists?.filter((artist)=> artist.owner === state.user?.user__id).length >0 )? <AlbumForm />:
+          <p className="text-myerror-500 bg-myerror-200 p-2 rounded font-semibold">Por Favor Crear al menos un Artista para crear un album</p>}
         </DialogContent>
       </Dialog>
         </section>

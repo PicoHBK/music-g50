@@ -21,25 +21,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import SongEdit from "@/components/forms/SongEdit";
+import PlayListEntrys from "@/components/PlayListEntrys";
 
 const fetchSongs = async () => {
   const { data } = await apiHarmSongPublic.get<SongsType[]>(`/songs`);
   return data;
 };
 
-const deleteSong = async (id:number) => {
-  const token = localStorage.getItem("token")
-  const { data } = await apiHarmSongPublic.delete(`/songs/${id}`,{
+const deleteSong = async (id: number) => {
+  const token = localStorage.getItem("token");
+  const { data } = await apiHarmSongPublic.delete(`/songs/${id}`, {
     headers: {
-      Authorization: `Token ${token}`
+      Authorization: `Token ${token}`,
     },
   });
   return data;
-}
+};
 
 
-
-function useSongs(filterGenRes:number| string, filterAlbum:number| string) {
+function useSongs(filterGenRes: number | string, filterAlbum: number | string, filterPlaylist: number[] | "all") {
   const { data, isLoading, error } = useQuery({
     queryKey: ["songs"],
     queryFn: fetchSongs,
@@ -50,17 +50,35 @@ function useSongs(filterGenRes:number| string, filterAlbum:number| string) {
 
   if (!isLoading && !error && data) {
     if (filterGenRes !== "all") {
-      filteredSongs = filteredSongs?.filter((song) => song.genres.includes(filterGenRes));
+      filteredSongs = filteredSongs?.filter((song) =>
+        song.genres.includes(filterGenRes)
+      );
+    }
+
+    if (filterPlaylist !== "all") {
+      filteredSongs = filteredSongs?.filter((song) =>
+        filterPlaylist.includes(song.id)
+      );
     }
     if (filterAlbum !== "all") {
-      filteredSongs = filteredSongs?.filter((song) => song.album === filterAlbum);
+      filteredSongs = filteredSongs?.filter(
+        (song) => song.album === filterAlbum
+      );
     }
   }
 
   return { data: filteredSongs, isLoading, error };
 }
-function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | number,filterAlbum:string | number}) {
-  const { data } = useSongs(filterGenRes, filterAlbum);
+function Songs({
+  filterGenRes = "all",
+  filterAlbum = "all",
+  filterPlayList = "all",
+}: {
+  filterGenRes: string | number;
+  filterAlbum: string | number;
+  filterPlayList: "all" | number[];
+}) {
+  const { data } = useSongs(filterGenRes, filterAlbum, filterPlayList);
   const { dispatch } = useSongsContext();
   const { state } = useAuthContext();
   const [showDialog, setShowDialog] = useState(false);
@@ -74,13 +92,12 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
     onSuccess: (data) => {
       console.log("song borrada");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ['songs'] })
-      if(data.code === "ERR_BAD_REQUEST"){
-        console.log("Algo salio mal")
+      queryClient.invalidateQueries({ queryKey: ["songs"] });
+      if (data.code === "ERR_BAD_REQUEST") {
+        console.log("Algo salio mal");
       }
     },
   });
-
 
   const addToPlayer = (song: SongsType) => {
     if (song.song_file) {
@@ -90,12 +107,10 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
     }
   };
 
-  const borrarSong = (id:number) => {
+  const borrarSong = (id: number) => {
     mutate(id);
     setShowDialog(false);
-  }
-
-
+  };
 
   return (
     <div className="w-full max-w-[700px]">
@@ -107,7 +122,12 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
               <th className="px-4 py-2 text-center font-normal">#</th>
               <th className="px-4 py-2 text-center font-normal">Nombre</th>
               <th className="px-4 py-2 text-center font-normal">Duración</th>
-              <th className="px-4 py-2 text-center font-normal"></th>
+              {state.auth && (
+                <th className="px-4 py-2 text-center font-normal"></th>
+              )}
+              {state.auth && (
+                <th className="px-4 py-2 text-center font-normal"></th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -130,6 +150,24 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
                 <td className="px-4 py-2 text-center text-mydark-50 font-normal select-none">
                   {"1:23"}
                 </td>
+                {state.auth && (
+                  <td>
+                    <Popover>
+                      <PopoverTrigger>
+                        <div className="w-6 h-6 p-1 hover:scale-125 transition">
+                          <img
+                            src="https://img.icons8.com/?size=100&id=iROmEg6KbKwI&format=png&color=0087A9"
+                            alt="edit"
+                          />
+                        </div>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <PlayListEntrys id={song.id} />
+                        
+                      </PopoverContent>
+                    </Popover>
+                  </td>
+                )}
                 {song.owner === state.user?.user__id && (
                   <td className="px-4 py-2 text-center">
                     <Popover>
@@ -154,14 +192,12 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>
-                                Editar
-                              </DialogTitle>
+                              <DialogTitle>Editar</DialogTitle>
                               <DialogDescription>
                                 Solo puedes editar tus canciones
                               </DialogDescription>
                             </DialogHeader>
-                            <SongEdit song={song}/>
+                            <SongEdit song={song} />
                           </DialogContent>
                         </Dialog>
                         <Dialog open={showDialog}>
@@ -175,19 +211,19 @@ function Songs({filterGenRes="all", filterAlbum="all"}:{filterGenRes:string | nu
                           </DialogTrigger>
                           <DialogContent className="flex flex-col justify-center items-center">
                             <DialogHeader>
-                              <DialogTitle>
-                                Estas seguro?
-                              </DialogTitle>
+                              <DialogTitle>Estas seguro?</DialogTitle>
                             </DialogHeader>
                             <DialogFooter>
-                              <button 
-                              onClick={() => borrarSong(song.id)}
-                              className="bg-myerror-400 text-myerror-100 py-2 px-6 rounded-lg hover:scale-105 transition">
+                              <button
+                                onClick={() => borrarSong(song.id)}
+                                className="bg-myerror-400 text-myerror-100 py-2 px-6 rounded-lg hover:scale-105 transition"
+                              >
                                 Si
                               </button>
-                              <button 
-                              onClick={() => setShowDialog(false)}
-                              className="bg-mylight-900 text-mydark-800 py-2 px-6 rounded-lg hover:scale-105 transition">
+                              <button
+                                onClick={() => setShowDialog(false)}
+                                className="bg-mylight-900 text-mydark-800 py-2 px-6 rounded-lg hover:scale-105 transition"
+                              >
                                 No
                               </button>
                             </DialogFooter>

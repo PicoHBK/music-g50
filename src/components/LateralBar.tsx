@@ -53,14 +53,6 @@ function LateralBar() {
                     Artistas
                 </h5>
             </button>
-            <button className="flex w-full gap-3 hover:scale-105 transition items-center" onClick={() => navigate("/playlists")}>
-                <div className="w-4 h-4">
-                    <img src="https://img.icons8.com/?size=100&id=31453&format=png&color=03A3A1" alt="home" className="w-full h-full" />
-                </div>
-                <h5 className="text-myprim-800 text-[11px]">
-                    Play Lists
-                </h5>
-            </button>
             <button className="flex w-full gap-3 hover:scale-105 transition items-center" onClick={() => navigate("/genres")}>
                 <div className="w-4 h-4">
                     <img src="https://img.icons8.com/?size=100&id=f6N0ObuRcP91&format=png&color=03A3A1" alt="home" className="w-full h-full" />
@@ -69,6 +61,15 @@ function LateralBar() {
                     Generos
                 </h5>
             </button>
+            <button className="flex w-full gap-3 hover:scale-105 transition items-center" onClick={() => navigate("/playlists")}>
+                <div className="w-4 h-4">
+                    <img src="https://img.icons8.com/?size=100&id=31453&format=png&color=03A3A1" alt="home" className="w-full h-full" />
+                </div>
+                <h5 className="text-myprim-800 text-[11px]">
+                    Play Lists
+                </h5>
+            </button>
+            
 
         </section>
 

@@ -11,7 +11,7 @@ function Artists() {
         <div className="flex flex-wrap w-full max-h-[388px] justify-start items-start gap-5 overflow-y-scroll no-scrollbar">
         {
                 artists?.map((artist) =>(
-                    <CardArtist artist={artist}/>
+                    <CardArtist artist={artist} key={artist.id}/>
 
                 ))
             }
