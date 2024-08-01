@@ -45,7 +45,7 @@ function PlayListEdit({playlist}:{playlist:PlayListType}) {
         onSuccess: (data) => {
           console.log("ON SUCCESS Play List");
           console.log(JSON.stringify(data));
-          queryClient.invalidateQueries({ queryKey: ["playlists"] });
+          queryClient.invalidateQueries({ queryKey: ["playlists-infiity"] });
           if (data.code === "ERR_BAD_REQUEST") {
             setMessage("Algo salio mal");
           }

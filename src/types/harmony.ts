@@ -1,3 +1,9 @@
+export interface PagSongType {
+  count: number;
+  next: null | string;
+  previous: null |string;
+  results : SongsType[]
+}
 export interface SongsType{
     id: number;
     created_at: string;
@@ -11,6 +17,14 @@ export interface SongsType{
     artists: any[];
     genres: any[];
   }
+  
+
+  export interface PagAlbumType {
+    count: number;
+    next: null | string;
+    previous: null |string;
+    results : AlbumType[]
+  }
 
   export interface AlbumType {
     id: number;
@@ -21,6 +35,14 @@ export interface SongsType{
     cover?: string;
     artist: number;
     owner: number;
+  }
+
+  export interface PagArtistType {
+    count: number;
+    next: null | string;
+    previous: null |string;
+    results : ArtistType[]
+
   }
 
   export interface ArtistType {
@@ -45,6 +67,13 @@ export interface SongsType{
     songs: number[];
   }
 
+  export interface PagPlayListType {
+    count: number;
+    next: null | string;
+    previous: null | string;
+    results : PlayListType[]
+  }
+
   export interface PlayListType {
     id: number;
     created_at: string;
@@ -64,6 +93,13 @@ export interface SongsType{
     playlist: number;
     song: number;
     owner: number;
+  }
+
+  export interface PagGenResType {
+    count: number;
+    next: null | string;
+    previous: null | string;
+    results : GenResType[]
   }
 
   export interface GenResType {

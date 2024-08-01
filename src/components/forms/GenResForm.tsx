@@ -42,7 +42,7 @@ function GenResForm() {
     onSuccess: (data) => {
       console.log("ON SUCCESS Gen");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ["albums"] });
+      queryClient.invalidateQueries({ queryKey: ["genres-infinity"] });
       if (data.code === "ERR_BAD_REQUEST") {
         setMessage("Algo salio mal");
       }

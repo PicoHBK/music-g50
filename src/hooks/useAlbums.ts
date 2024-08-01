@@ -1,18 +1,46 @@
 import apiHarmSongPublic from "@/apis/publicHarmonySong";
-import { AlbumType } from "@/types/harmony";
-import { useQuery } from "@tanstack/react-query";
+import { PagAlbumType } from "@/types/harmony";
+
+import { useInfiniteQuery, useQuery} from "@tanstack/react-query";
 
 const fetchAlbums = async () => {
-    const { data } = await apiHarmSongPublic.get<AlbumType[]>(`/albums`);
+    const { data } = await apiHarmSongPublic<PagAlbumType>(`/albums`);
     return data;
 }
+
+const fetchAlbumsPag = async ({ pageParam }: { pageParam: number }) => {
+    const { data } = await apiHarmSongPublic.get<PagAlbumType>(`/albums?page=${pageParam}`);
+    return data;
+  };
+
+
+
 export function useAlbums() {
     const { data } = useQuery({
         queryKey: ["albums"],
         queryFn: fetchAlbums,
         staleTime: Infinity,
-    });7
-    
+    });
 
-    return {data}
+    const {
+        data:dataPag,
+        fetchNextPage,
+        isFetchingNextPage,
+        hasNextPage,
+      } = useInfiniteQuery({
+        queryKey: ['albums-infinity'],
+        queryFn: fetchAlbumsPag,
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages, lastPageParam) => {
+          const nextPage = lastPage.next !== null ? lastPageParam + 1 : undefined 
+          console.log(allPages.fill)
+          return nextPage;
+        },
+        staleTime: Infinity,
+        retry: 3
+      });
+
+    const filterAlbums  = data?.results
+
+    return {data: filterAlbums, dataPag ,fetchNextPage ,hasNextPage, isFetchingNextPage}
 }

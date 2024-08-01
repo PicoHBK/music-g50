@@ -3,7 +3,7 @@ import { useAlbums } from "@/hooks/useAlbums";
 
 
 function Albums() {
-    const { data:albums } = useAlbums();
+    const { data:albums} = useAlbums();
 
   return (
     <div className="max-w-24 w-full lg:max-w-[348px] max-h-[388px]">

@@ -65,7 +65,7 @@ function AlbumForm() {
     onSuccess: (data) => {
       console.log("ON SUCCESS SONG");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ["albums"] });
+      queryClient.invalidateQueries({ queryKey: ["albums-infinity"] });
       if (data.code === "ERR_BAD_REQUEST") {
         setMessage("Algo salio mal");
       }

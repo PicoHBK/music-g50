@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiHarmSongPublic from "../apis/publicHarmonySong";
 import { SongsType } from "../types/harmony";
 import { useSongsContext } from "../hooks/usePlayerSong";
@@ -22,11 +22,8 @@ import {
 } from "@/components/ui/popover";
 import SongEdit from "@/components/forms/SongEdit";
 import PlayListEntrys from "@/components/PlayListEntrys";
+import { useSongs } from "@/hooks/useSongs";
 
-const fetchSongs = async () => {
-  const { data } = await apiHarmSongPublic.get<SongsType[]>(`/songs`);
-  return data;
-};
 
 const deleteSong = async (id: number) => {
   const token = localStorage.getItem("token");
@@ -39,36 +36,7 @@ const deleteSong = async (id: number) => {
 };
 
 
-function useSongs(filterGenRes: number | string, filterAlbum: number | string, filterPlaylist: number[] | "all") {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["songs"],
-    queryFn: fetchSongs,
-    staleTime: Infinity,
-  });
 
-  let filteredSongs = data;
-
-  if (!isLoading && !error && data) {
-    if (filterGenRes !== "all") {
-      filteredSongs = filteredSongs?.filter((song) =>
-        song.genres.includes(filterGenRes)
-      );
-    }
-
-    if (filterPlaylist !== "all") {
-      filteredSongs = filteredSongs?.filter((song) =>
-        filterPlaylist.includes(song.id)
-      );
-    }
-    if (filterAlbum !== "all") {
-      filteredSongs = filteredSongs?.filter(
-        (song) => song.album === filterAlbum
-      );
-    }
-  }
-
-  return { data: filteredSongs, isLoading, error };
-}
 function Songs({
   filterGenRes = "all",
   filterAlbum = "all",
@@ -78,7 +46,7 @@ function Songs({
   filterAlbum: string | number;
   filterPlayList: "all" | number[];
 }) {
-  const { data } = useSongs(filterGenRes, filterAlbum, filterPlayList);
+  const { data, hasNextPage,hasPrevPage, setPageNum ,isLoading } = useSongs(filterGenRes, filterAlbum, filterPlayList);
   const { dispatch } = useSongsContext();
   const { state } = useAuthContext();
   const [showDialog, setShowDialog] = useState(false);
@@ -115,7 +83,9 @@ function Songs({
   return (
     <div className="w-full max-w-[700px]">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
-      <div className="overflow-x-auto">
+      
+      
+      {!isLoading ? <div className="flex  flex-col overflow-x-auto justify-center items-center gap-2">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-myprim-100 text-myprim-900">
@@ -237,7 +207,19 @@ function Songs({
             ))}
           </tbody>
         </table>
-      </div>
+        <section className="flex justify-center gap-4">
+          {hasPrevPage && 
+                <button className="w-5 h-5" onClick={() => setPageNum(prev => (prev - 1))}>
+                  <img src="https://img.icons8.com/?size=100&id=L7zmVGbt7359&format=png&color=000000" alt="next" className="w-full h-full object-fill" />
+                </button>
+                }
+                {hasNextPage &&
+          <button className="w-5 h-5" onClick={() => setPageNum(prev => (prev + 1))}>
+          <img src="https://img.icons8.com/?size=100&id=BiU5bOFL0yf8&format=png&color=000000" alt="next" className="w-full h-full object-fill" />
+        </button>
+                }
+        </section>
+      </div>:<p className="text-center">Cargando ...</p>}
     </div>
   );
 }

@@ -60,7 +60,7 @@ function AlbumEdit({ album }: { album: AlbumType }) {
     onSuccess: (data) => {
       console.log("ON SUCCESS SONG");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ["albums"] });
+      queryClient.invalidateQueries({ queryKey: ["albums-infinity"] });
       if (data.code === "ERR_BAD_REQUEST") {
         setMessage("Algo salio mal");
       }
@@ -170,7 +170,7 @@ function AlbumEdit({ album }: { album: AlbumType }) {
               type="submit"
               className="inline bg-mywarn-500 text-mywarn-100 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
             >
-              Crear Album
+              Editar Album
             </button>
           ) : (
             <div className="w-10 h-10">

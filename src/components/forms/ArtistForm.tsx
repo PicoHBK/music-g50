@@ -56,7 +56,7 @@ function ArtistForm() {
     onSuccess: (data) => {
       console.log("ON SUCCESS Artists");
       console.log(JSON.stringify(data));
-      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: ["artists-infiity"] });
       if (data.code === "ERR_BAD_REQUEST") {
         setMessage("Algo salio mal");
       }
