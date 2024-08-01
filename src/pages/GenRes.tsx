@@ -247,11 +247,7 @@ function GenRes() {
         </div>
       </div>
       {gen && (
-        <Songs
-          filterGenRes={gen?.id}
-          filterAlbum={"all"}
-          filterPlayList={"all"}
-        />
+        <Songs filters={{ filterAlbum: gen.id }} />
       )}
     </div>
   );

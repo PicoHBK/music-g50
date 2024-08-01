@@ -84,6 +84,12 @@ export interface SongsType{
     owner: number;
     entries: number[];
   }
+  export interface PagPlayListEntry {
+    count: number;
+    next: null | string;
+    previous: null | string;
+    results : PlayListEntry
+  }
 
   export interface PlayListEntry {
     id: number;

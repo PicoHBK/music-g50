@@ -21,12 +21,11 @@ export function useArtists() {
         isFetchingNextPage,
         hasNextPage,
       } = useInfiniteQuery({
-        queryKey: ['artists-infiity'],
+        queryKey: ['artists-infinity'],
         queryFn: fetchArtistPag,
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages, lastPageParam) => {
           const nextPage = lastPage.next !== null ? lastPageParam + 1 : undefined 
-          console.log(allPages.fill)
           return nextPage;
         },
         staleTime: Infinity,

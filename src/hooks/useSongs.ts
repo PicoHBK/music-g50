@@ -3,62 +3,72 @@ import { PagSongType } from "@/types/harmony";
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+interface UseSongsArgsType {
+  filterArtist?: number;
+  filterAlbum?: number;
+  filterPlayList?: number;
+  filterGenre?: number;
+}
 
-const fetchSongs = async (ctx:QueryFunctionContext) => {
-    const [_, pageNum] = ctx.queryKey
-    void _;
-    const { data } = await apiHarmSongPublic.get<PagSongType>(`/songs?page=${pageNum}`);
-    return data;
-  };
+const buildUrl = (filters: UseSongsArgsType, pageNum: number) => {
+  let url = '/songs'; // Ruta por defecto sin filtros
 
+  // Construir la URL en función de los filtros activos
+  switch (true) {
+    case !!filters.filterAlbum:
+      url = `/albums/${filters.filterAlbum}/songs`;
+      break;
+    case !!filters.filterArtist:
+      url = `/artists/${filters.filterArtist}/songs`;
+      break;
+    case !!filters.filterPlayList:
+      url = `/playlists/${filters.filterPlayList}/songs`;
+      break;
+    case !!filters.filterGenre:
+      url = `/genres/${filters.filterGenre}/songs`;
+      break;
+    default:
+      // Ruta por defecto si ningún filtro está presente
+      url = `/songs`;
+      break;
+  }
 
-  export function useSongs(filterGenRes: number | string, filterAlbum: number | string, filterPlaylist: number[] | "all") {
+  return `${url}?page=${pageNum}`;
+};
 
-    const [pageNum, setPageNum] = useState(1) 
-    const [hasNextPage,setHasNextPage] = useState(false) 
-    const [hasPrevPage,setHasPrevPage] = useState(false) 
-    const { data, isLoading, isSuccess} = useQuery({
-        queryKey: ["songs", pageNum], 
-        queryFn: fetchSongs,
-        staleTime: Infinity,
-    });
+const fetchSongs = async (ctx: QueryFunctionContext) => {
+  const [_, filters, pageNum] = ctx.queryKey;
+  void _;
 
-    useEffect(() =>{
-        if(isSuccess && data.next){
-            setHasNextPage(true)
-        }else{
-            setHasNextPage(false)
-        }
+  // Asegurarse de que `filters` tiene el tipo correcto
+  const typedFilters: UseSongsArgsType = filters as UseSongsArgsType;
+  const url = buildUrl(typedFilters, pageNum as number);
 
-        if(isSuccess && data.previous){
-            setHasPrevPage(true)
-        }else{
-            setHasPrevPage(false)
-        }
+  const { data } = await apiHarmSongPublic.get<PagSongType>(url);
+  return data;
+};
 
-    },[isSuccess, data])
+export function useSongs(args: UseSongsArgsType = {}) {
+  const { filterArtist, filterAlbum, filterPlayList, filterGenre } = args;
+  const [pageNum, setPageNum] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
 
-    let filteredSongs = data?.results;
+  const { data, isLoading, isSuccess } = useQuery({
+    queryKey: ["songs", { filterArtist, filterAlbum, filterPlayList, filterGenre }, pageNum],
+    queryFn: fetchSongs,
+    staleTime: Infinity,
+  });
 
-
-    if (!isLoading && data) {
-        if (filterGenRes !== "all") {
-            filteredSongs = filteredSongs?.filter((song) =>
-                song.genres.includes(filterGenRes)
-            );
-        }
-
-        if (filterPlaylist !== "all") {
-            filteredSongs = filteredSongs?.filter((song) =>
-                filterPlaylist.includes(song.id)
-            );
-        }
-        if (filterAlbum !== "all") {
-            filteredSongs = filteredSongs?.filter(
-                (song) => song.album === filterAlbum
-            );
-        }
+  useEffect(() => {
+    if (isSuccess && data) {
+      setHasNextPage(!!data.next);
+      setHasPrevPage(!!data.previous);
+    } else {
+      setHasNextPage(false);
+      setHasPrevPage(false);
     }
+  }, [isSuccess, data]);
 
-    return { data: filteredSongs, isLoading, setPageNum, hasNextPage, hasPrevPage};
+  return { data:data?.results, isSuccess, isLoading, hasNextPage, hasPrevPage, setPageNum };
 }

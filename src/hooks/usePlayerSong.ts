@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { SongsContext } from '../context/playerSong';
 import { SongsState, SongsAction } from '../reducer/playerSong';
 
-export const useSongsContext = (): {
+export const usePlayerContext = (): {
   state: SongsState;
   dispatch: React.Dispatch<SongsAction>;
 } => {

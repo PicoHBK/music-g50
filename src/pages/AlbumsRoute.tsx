@@ -116,11 +116,7 @@ function AlbumsRoute() {
                 <DialogDescription>{album.year}</DialogDescription>
               </DialogHeader>
               {!edit && !borrar && (
-                <Songs
-                  filterGenRes="all"
-                  filterAlbum={album.id}
-                  filterPlayList="all"
-                />
+                <Songs filters={{ filterAlbum: album.id }} />
               )}
               {!edit ? (
                 <div className="flex flex-col gap-2">
@@ -166,9 +162,14 @@ function AlbumsRoute() {
         ))
       )}
 
-      {hasNextPage&&<button className=" p-2 text-myprim-800 rounded-full bg-myprim-300 hover:scale-110 transition active:scale-100" onClick={()=> fetchNextPage()}>
+      {hasNextPage && (
+        <button
+          className=" p-2 text-myprim-800 rounded-full bg-myprim-300 hover:scale-110 transition active:scale-100"
+          onClick={() => fetchNextPage()}
+        >
           Cargar Mas
-        </button>}
+        </button>
+      )}
 
       <section>
         <Dialog>

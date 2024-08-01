@@ -1,7 +1,9 @@
+import { usePlaylistContext } from "@/hooks/usePlayListContext";
 import { useNavigate } from "react-router-dom";
 
 function LateralBar() {
     const navigate = useNavigate()
+    const {state} = usePlaylistContext()
   return (
     <div className="flex flex-col w-full items-center max-w-64 min-h-screen bg-myprim-50 font-lato gap-5">
         <h2 className="font-extrabold text-3xl text-myprim-700 break-words ">
@@ -72,6 +74,14 @@ function LateralBar() {
             
 
         </section>
+        <section className="flex flex-col">
+
+        </section>
+        {
+            state.playlist.map(song=> (
+                <p className={state.currentSong === song ? "bg-myprim-400 p-2":"p-2"}>{song}</p>
+            ))
+        }
 
         </section>
       

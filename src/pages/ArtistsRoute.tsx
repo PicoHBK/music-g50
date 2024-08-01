@@ -28,7 +28,7 @@ const deleteArtist = async (id: number) => {
 };
 
 function ArtistsRoute() {
-  const { data: artists, dataPag, hasNextPage, fetchNextPage } = useArtists();
+  const { dataPag, hasNextPage, fetchNextPage } = useArtists();
   const { state } = useAuthContext();
   const [edit, setEdit] = useState(false);
   const [borrar, setBorrar] = useState(false);

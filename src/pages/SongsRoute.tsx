@@ -8,11 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useSongs } from "@/hooks/useSongs";
 
 function SongsRoute() {
+  const {data} = useSongs()
   return (
     <div className="flex w-full">
-      <Songs filterGenRes="all" filterAlbum="all" />
+      {data && <Songs filters={{}}/>}
       <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">

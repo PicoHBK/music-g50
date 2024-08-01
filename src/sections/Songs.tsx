@@ -1,7 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiHarmSongPublic from "../apis/publicHarmonySong";
-import { SongsType } from "../types/harmony";
-import { useSongsContext } from "../hooks/usePlayerSong";
 import { useAuthContext } from "@/hooks/useAuth";
 
 import {
@@ -20,10 +18,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+
+
 import SongEdit from "@/components/forms/SongEdit";
 import PlayListEntrys from "@/components/PlayListEntrys";
 import { useSongs } from "@/hooks/useSongs";
+import { usePlaylistContext } from "@/hooks/usePlayListContext";
 
+interface UseSongsArgsType {
+  filterArtist?: number;
+  filterAlbum?: number;
+  filterPlayList?: number;
+  filterGenre?: number;
+}
 
 const deleteSong = async (id: number) => {
   const token = localStorage.getItem("token");
@@ -35,22 +43,17 @@ const deleteSong = async (id: number) => {
   return data;
 };
 
-
-
-function Songs({
-  filterGenRes = "all",
-  filterAlbum = "all",
-  filterPlayList = "all",
-}: {
-  filterGenRes: string | number;
-  filterAlbum: string | number;
-  filterPlayList: "all" | number[];
-}) {
-  const { data, hasNextPage,hasPrevPage, setPageNum ,isLoading } = useSongs(filterGenRes, filterAlbum, filterPlayList);
-  const { dispatch } = useSongsContext();
+function Songs({ filters = {} }: { filters: UseSongsArgsType }) {
+  const { dispatch,state:statePlayList } = usePlaylistContext()
   const { state } = useAuthContext();
   const [showDialog, setShowDialog] = useState(false);
   const queryClient = useQueryClient();
+  const {
+    data: songs,
+    hasNextPage,
+    hasPrevPage,
+    setPageNum,
+  } = useSongs(filters);
 
   const { mutate } = useMutation({
     mutationFn: deleteSong,
@@ -67,14 +70,6 @@ function Songs({
     },
   });
 
-  const addToPlayer = (song: SongsType) => {
-    if (song.song_file) {
-      dispatch({ type: "SET_SONG", payload: song });
-    } else {
-      console.log("Sin File de la Musica por favor agregue una archivo");
-    }
-  };
-
   const borrarSong = (id: number) => {
     mutate(id);
     setShowDialog(false);
@@ -83,13 +78,14 @@ function Songs({
   return (
     <div className="w-full max-w-[700px]">
       <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
-      
-      
-      {!isLoading ? <div className="flex  flex-col overflow-x-auto justify-center items-center gap-2">
+
+      <div className="flex  flex-col overflow-x-auto justify-center items-center gap-2">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-myprim-100 text-myprim-900">
               <th className="px-4 py-2 text-center font-normal">#</th>
+              <th className="px-4 py-2 text-center font-normal"></th>
+              <th className="px-4 py-2 text-center font-normal"></th>
               <th className="px-4 py-2 text-center font-normal">Nombre</th>
               <th className="px-4 py-2 text-center font-normal">Duración</th>
               {state.auth && (
@@ -101,18 +97,57 @@ function Songs({
             </tr>
           </thead>
           <tbody>
-            {data?.map((song, index) => (
-              <tr
+            {songs?.map((song, index) => (
+      
+              song.song_file&&<tr
                 key={song.id}
                 className={
                   song.song_file
                     ? "hover:bg-myprim-400 transition-colors"
                     : "bg-opacity-75 bg-myerror-100 cursor-not-allowed"
                 }
-                onClick={() => addToPlayer(song)}
               >
                 <td className="px-4 py-2 text-center text-mydark-50 font-light select-none">
                   {index + 1}
+                </td>
+                <td>
+                  <button
+                    className="w-6 h-6 flex items-center justify-center hover:scale-110"
+                    onClick={() =>
+                      dispatch({ type:"REPLACE_PLAYLIST_WITH_SONG", payload: song.id })
+                    }
+                  >
+                    <img
+                      src="https://img.icons8.com/?size=100&id=80556&format=png&color=000000"
+                      alt="play"
+                      className="w-full h-full object-fill"
+                    />
+                  </button>
+                </td>
+                <td>
+                  {!statePlayList.playlist.includes(song.id)?<button
+                    className="w-4 h-4 flex items-center justify-center hover:scale-110"
+                    onClick={() =>
+                      dispatch({ type:"ADD_SONG", payload: song.id })
+                    }
+                  >
+                    <img
+                      src="https://img.icons8.com/?size=100&id=EQh9HbAEgYS9&format=png&color=015770"
+                      alt="play"
+                      className="w-full h-full object-fill"
+                    />
+                  </button>:<button
+                    className="w-4 h-4 flex items-center justify-center hover:scale-110"
+                    onClick={() =>
+                      dispatch({ type:"REMOVE_SONG", payload: song.id })
+                    }
+                  >
+                    <img
+                      src="https://img.icons8.com/?size=100&id=13180&format=png&color=FF1919"
+                      alt="play"
+                      className="w-full h-full object-fill"
+                    />
+                  </button>}
                 </td>
                 <td className="px-4 py-2 text-center text-mydark-500 font-bold select-none">
                   {song.title}
@@ -133,7 +168,6 @@ function Songs({
                       </PopoverTrigger>
                       <PopoverContent>
                         <PlayListEntrys id={song.id} />
-                        
                       </PopoverContent>
                     </Popover>
                   </td>
@@ -208,18 +242,32 @@ function Songs({
           </tbody>
         </table>
         <section className="flex justify-center gap-4">
-          {hasPrevPage && 
-                <button className="w-5 h-5" onClick={() => setPageNum(prev => (prev - 1))}>
-                  <img src="https://img.icons8.com/?size=100&id=L7zmVGbt7359&format=png&color=000000" alt="next" className="w-full h-full object-fill" />
-                </button>
-                }
-                {hasNextPage &&
-          <button className="w-5 h-5" onClick={() => setPageNum(prev => (prev + 1))}>
-          <img src="https://img.icons8.com/?size=100&id=BiU5bOFL0yf8&format=png&color=000000" alt="next" className="w-full h-full object-fill" />
-        </button>
-                }
+          {hasPrevPage && (
+            <button
+              className="w-5 h-5"
+              onClick={() => setPageNum((prev) => prev - 1)}
+            >
+              <img
+                src="https://img.icons8.com/?size=100&id=L7zmVGbt7359&format=png&color=000000"
+                alt="next"
+                className="w-full h-full object-fill"
+              />
+            </button>
+          )}
+          {hasNextPage && (
+            <button
+              className="w-5 h-5"
+              onClick={() => setPageNum((prev) => prev + 1)}
+            >
+              <img
+                src="https://img.icons8.com/?size=100&id=BiU5bOFL0yf8&format=png&color=000000"
+                alt="next"
+                className="w-full h-full object-fill"
+              />
+            </button>
+          )}
         </section>
-      </div>:<p className="text-center">Cargando ...</p>}
+      </div>
     </div>
   );
 }
