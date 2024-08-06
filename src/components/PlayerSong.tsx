@@ -41,11 +41,6 @@ const PlayerSong = () => {
   };
   const handleShuffle = () => {
     setShuffle(!shuffle);
-    if (!shuffle) {
-      dispatch({ type: 'SHUFFLE_PLAYLIST', payload: undefined });
-    } else {
-      dispatch({ type: 'UNSHUFFLE_PLAYLIST', payload: undefined });
-    }
   };
   
   const handleNext = () => {
