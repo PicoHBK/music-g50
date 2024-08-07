@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuthContext } from "@/hooks/useAuth";
+import { usePlaylistContext } from "@/hooks/usePlayListContext";
 import { usePlaylists } from "@/hooks/usePlayLists";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -31,6 +32,7 @@ function PlayListsRoute() {
   const [borrar, setBorrar] = useState(false);
   const [loading, setLoading] = useState(false);
   const { state } = useAuthContext();
+  const {dispatch} = usePlaylistContext()
   const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
@@ -86,6 +88,9 @@ function PlayListsRoute() {
                 <DialogHeader>
                   <DialogTitle>{playlist.name}</DialogTitle>
                   <DialogDescription>{playlist.description}</DialogDescription>
+                  <button className="h-8 w-8 hover:scale-105 active:scale-95" onClick={()=> dispatch({type:"SET_PLAYLIST", payload:playlist.entries})}>
+                    <img src="https://img.icons8.com/?size=100&id=80556&format=png&color=000000" alt="play playlist" className="w-full h-full object-cover" />
+                  </button>
                 </DialogHeader>
                 <SongsById ids={playlist.entries} />
                 {!edit ? (
@@ -141,7 +146,7 @@ function PlayListsRoute() {
         )}
       </div>
 
-      <section>
+      {state.auth && <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">
             <div className="w-10 h-10 hover:scale-110 transition active:scale-100">
@@ -161,7 +166,7 @@ function PlayListsRoute() {
             <PlayListForm />
           </DialogContent>
         </Dialog>
-      </section>
+      </section>}
     </div>
   );
 }

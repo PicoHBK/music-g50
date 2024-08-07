@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChangeEvent, FormEvent, useState } from "react";
 import apiHarmSongPrivate from "../apis/privateHarmonySong";
 import { useNavigate } from "react-router-dom";
@@ -25,12 +25,16 @@ const login = (formData: EventFormData) => {
       });
   };
 
+
 function Login() {
   const {dispatch} = useAuthContext()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<EventFormData>({
     username: "",
     password: "",
   });
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { mutate } = useMutation({
@@ -45,7 +49,9 @@ function Login() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         dispatch({type: "SET_AUTH", payload: true})
+        queryClient.invalidateQueries({queryKey:["userData"]})
         navigate("/")
+        
       }
       if(data.code === "ERR_BAD_REQUEST"){
         setMessage("Usuario o Contraseña Incorrecta")
@@ -53,64 +59,82 @@ function Login() {
       setLoading(false);
     },
   });
+  
 
-  const navigate = useNavigate()
+
+  
+
+  
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setMessage("");
   };
-
+  
   const submitForm = (e: FormEvent): void => {
     e.preventDefault();
-    console.log(formData)
+  
+    if (!formData.username) {
+      setMessage("El campo 'Usuario' es obligatorio");
+      return;
+    }
+  
+    if (!formData.password) {
+      setMessage("El campo 'Contraseña' es obligatorio");
+      return;
+    }
+  
     setLoading(true);
-    mutate(formData)
+    mutate(formData);
   };
 
 
   
 
   return (
-    <form onSubmit={submitForm} className="flex flex-col font-lato gap-3 items-center text-mydark-100">
-      <input
-        name="username"
-        type="text"
-        maxLength={25}
-        placeholder="Usuario"
-        className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-        onChange={handleChange}
-        disabled={loading}
-      />
-      <input
-        name="password"
-        type="password"
-        maxLength={25}
-        placeholder="Contraseña"
-        className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
-        onChange={handleChange}
-        disabled={loading}
-      />
-      {!loading ? (
-        <button
-          type="submit"
-          className="inline bg-myprim-600 text-myprim-200 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
-        >
-          ENTRAR
-        </button>
-      ) : (
-        <div className="w-10 h-10">
-          <img
-            src="https://img.icons8.com/?size=100&id=ldCN5cWRfXQ5&format=png&color=000000"
-            alt=" loading"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-      {message && <p className="text-md text-myerror-500 font-bold">{message}</p>}
-    </form>
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl font-bold text-mydark-100 mb-4">Login</h1>
+      <form onSubmit={submitForm} className="flex flex-col font-lato gap-3 items-center text-mydark-100">
+        <input
+          name="username"
+          type="text"
+          maxLength={25}
+          placeholder="Usuario"
+          className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
+          onChange={handleChange}
+          disabled={loading}
+        />
+        <input
+          name="password"
+          type="password"
+          maxLength={25}
+          placeholder="Contraseña"
+          className="border-myneutral-400 border-[1px] px-3 py-2 rounded-sm font-semibold"
+          onChange={handleChange}
+          disabled={loading}
+        />
+        {!loading ? (
+          <button
+            type="submit"
+            className="inline bg-myprim-600 text-myprim-200 py-2 px-6 font-bold rounded-sd transition-colors duration-300 hover:bg-mysec-400 focus:outline-none active:bg-mysec-700 active:duration-2000"
+          >
+            ENTRAR
+          </button>
+        ) : (
+          <div className="w-10 h-10">
+            <img
+              src="https://img.icons8.com/?size=100&id=ldCN5cWRfXQ5&format=png&color=000000"
+              alt="loading"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        {message && <p className="text-md text-myerror-500 font-bold">{message}</p>}
+      </form>
+    </div>
   );
+  
 }
 
 export default Login;

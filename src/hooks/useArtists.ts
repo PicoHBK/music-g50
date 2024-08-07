@@ -8,7 +8,7 @@ const fetchArtists = async () => {
 }
 
 const fetchArtistPag = async ({ pageParam }: { pageParam: number }) => {
-    const { data } = await apiHarmSongPublic.get<PagArtistType>(`/artists?page=${pageParam}`);
+    const { data } = await apiHarmSongPublic.get<PagArtistType>(`/artists?page=${pageParam}&page_size=30`);
     return data;
   };
 

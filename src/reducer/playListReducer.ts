@@ -6,14 +6,16 @@ export interface SongsState {
   }
   
   export type SongsAction =
-    | { type: 'ADD_SONG'; payload: number }
-    | { type: 'REMOVE_SONG'; payload: number }
-    | { type: 'ADD_PLAYLIST'; payload: number[] }
-    | { type: 'CLEAR_PLAYLIST'; payload: void }
-    | { type: 'SET_CURRENT_SONG'; payload: number } // ID de la canción actual
-    | { type: 'NEXT_SONG'; payload: void }
-    | { type: 'PREV_SONG'; payload: void }
-    | { type: 'REPLACE_PLAYLIST_WITH_SONG'; payload: number }; // Nueva acción
+  | { type: 'ADD_SONG'; payload: number }
+  | { type: 'REMOVE_SONG'; payload: number }
+  | { type: 'ADD_PLAYLIST'; payload: number[] }
+  | { type: 'CLEAR_PLAYLIST'; payload: void }
+  | { type: 'SET_CURRENT_SONG'; payload: number } // ID de la canción actual
+  | { type: 'NEXT_SONG'; payload: void }
+  | { type: 'PREV_SONG'; payload: void }
+  | { type: 'REPLACE_PLAYLIST_WITH_SONG'; payload: number } // Nueva acción
+  | { type: 'SET_PLAYLIST'; payload: number[] }; // Nueva acción
+
   
   export const initialState: SongsState = {
     playlist: [],
@@ -84,6 +86,22 @@ export interface SongsState {
           nextSong
         };
       }
+      case 'SET_PLAYLIST': {
+        const newPlaylist = action.payload;
+        const newCurrentSong = newPlaylist.length > 0 ? newPlaylist[0] : null;
+        const { prevSong, nextSong } = getPrevNextSongs(newPlaylist, newCurrentSong);
+      
+        return {
+          ...state,
+          playlist: newPlaylist, // Reemplaza la playlist con la nueva canción
+          currentSong: newCurrentSong, // Establece la canción actual a la nueva canción
+          prevSong,
+          nextSong
+        };
+      }
+      
+      
+      
       case 'CLEAR_PLAYLIST': {
         return {
           ...state,

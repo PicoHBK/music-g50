@@ -11,9 +11,9 @@ import GenRes from "../pages/GenRes";
 
 const Layout = () => (
     <>
-      <section className="flex w-full">
+      <section className="flex w-full relative">
         <LateralBar />
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full m-5">
           <Header />
           <Outlet />
         </div>

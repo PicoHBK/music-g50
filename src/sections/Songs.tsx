@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import {useState } from "react";
 
 import {
   Popover,
@@ -70,6 +70,7 @@ function Songs({ filters = {} }: { filters: UseSongsArgsType }) {
     },
   });
 
+ 
   const borrarSong = (id: number) => {
     mutate(id);
     setShowDialog(false);
@@ -77,8 +78,6 @@ function Songs({ filters = {} }: { filters: UseSongsArgsType }) {
 
   return (
     <div className="w-full max-w-[700px]">
-      <h2 className="text-lg font-bold text-myprim-600">Canciones</h2>
-
       <div className="flex  flex-col overflow-x-auto justify-center items-center gap-2">
         <table className="w-full text-sm">
           <thead>
@@ -99,7 +98,7 @@ function Songs({ filters = {} }: { filters: UseSongsArgsType }) {
           <tbody>
             {songs?.map((song, index) => (
       
-              song.song_file&&<tr
+                song.song_file&&<tr
                 key={song.id}
                 className={
                   song.song_file

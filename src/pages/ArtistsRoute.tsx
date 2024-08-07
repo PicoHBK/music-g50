@@ -166,7 +166,7 @@ function ArtistsRoute() {
           </button>
         )}
       </div>
-      <section>
+      {state.auth && <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">
             <div className="w-10 h-10 hover:scale-110 transition active:scale-100">
@@ -186,7 +186,7 @@ function ArtistsRoute() {
             <ArtistForm />
           </DialogContent>
         </Dialog>
-      </section>
+      </section>}
     </div>
   );
 }

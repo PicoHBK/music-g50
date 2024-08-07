@@ -8,7 +8,7 @@ const fetchPlayLists = async () => {
   };
 
   const fetchPlayListPag = async ({ pageParam }: { pageParam: number }) => {
-    const { data } = await apiHarmSongPublic.get<PagPlayListType>(`/playlists?page=${pageParam}`);
+    const { data } = await apiHarmSongPublic.get<PagPlayListType>(`/playlists?page=${pageParam}&page_size=30`);
     return data;
   };
 

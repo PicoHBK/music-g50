@@ -9,13 +9,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useSongs } from "@/hooks/useSongs";
+import { useAuthContext } from "@/hooks/useAuth";
 
 function SongsRoute() {
   const {data} = useSongs()
+  const {state} = useAuthContext()
   return (
     <div className="flex w-full">
       {data && <Songs filters={{}}/>}
-      <section>
+      {state.auth && <section>
         <Dialog>
           <DialogTrigger className="rounded-lg p-2 flex flex-col items-center">
           <div className="w-10 h-10 hover:scale-110 transition active:scale-100">
@@ -32,13 +34,12 @@ function SongsRoute() {
               <DialogTitle>Agregar Canción</DialogTitle>
               <DialogDescription>
                 Solo mp3
-                
               </DialogDescription>
               <SongForm/>
             </DialogHeader>
           </DialogContent>
         </Dialog>
-      </section>
+      </section>}
     </div>
   );
 }

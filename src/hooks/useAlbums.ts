@@ -9,7 +9,7 @@ const fetchAlbums = async () => {
 }
 
 const fetchAlbumsPag = async ({ pageParam }: { pageParam: number }) => {
-    const { data } = await apiHarmSongPublic.get<PagAlbumType>(`/albums?page=${pageParam}`);
+    const { data } = await apiHarmSongPublic.get<PagAlbumType>(`/albums?page=${pageParam}&page_size=30`);
     return data;
   };
 
