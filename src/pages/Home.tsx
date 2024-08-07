@@ -5,7 +5,7 @@ import Songs from "../sections/Songs"
 function Home() {
   return (
     <div className="flex w-full h-full justify-center items-start gap-4">
-        <Songs filterAlbum={"all"} filterGenRes={"all"} filterPlayList={"all"}/>
+        <Songs filters={{}}/>
           <div className="flex flex-col gap-20">
           <Albums />
           <Artists />
