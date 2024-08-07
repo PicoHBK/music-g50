@@ -25,17 +25,17 @@ const postPlayListEntry = ({ formData }: { formData: FormData }) => {
     .catch((error) => {
       return error;
     });
-}
+};
 
 const deletePlayListEntry = async (id: number) => {
-    const token = localStorage.getItem("token");
-    const { data } = await apiHarmSongPublic.delete(`playlist-entries/${id}/`, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    });
-    return data;
-  };
+  const token = localStorage.getItem("token");
+  const { data } = await apiHarmSongPublic.delete(`playlist-entries/${id}/`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return data;
+};
 
 function SongInPlayList({
   playlist,
@@ -45,7 +45,7 @@ function SongInPlayList({
   idSong: number;
 }) {
   const queryClient = useQueryClient();
-  const {data:playListEntries} = usePlaylistEntry()
+  const { data: playListEntries } = usePlaylistEntry();
   const { mutate } = useMutation({
     mutationFn: postPlayListEntry,
     onSuccess: (data) => {
@@ -59,7 +59,7 @@ function SongInPlayList({
       // Realiza alguna acción en caso de error al añadir la canción a la playlist
     },
   });
-  const { mutate:deletePlayListEntryMutate } = useMutation({
+  const { mutate: deletePlayListEntryMutate } = useMutation({
     mutationFn: deletePlayListEntry,
     onSuccess: (data) => {
       console.log("Canción quitada de la playlist");
@@ -89,7 +89,7 @@ function SongInPlayList({
 
   const handleCheckboxChange = () => {
     const isInPlaylist = playlist.entries.includes(idSong);
-    setCheck(prevCheck => !prevCheck);
+    setCheck((prevCheck) => !prevCheck);
 
     if (!isInPlaylist) {
       const formData: FormData = {
@@ -98,10 +98,11 @@ function SongInPlayList({
         song: idSong,
       };
       mutate({ formData });
-    }else {
-        const idPlayListEntry  = playListEntries?.find((plen) => plen.song === idSong && plen.playlist === playlist.id)
-        if(idPlayListEntry) deletePlayListEntryMutate(idPlayListEntry.id)
-
+    } else {
+      const idPlayListEntry = playListEntries?.find(
+        (plen) => plen.song === idSong && plen.playlist === playlist.id
+      );
+      if (idPlayListEntry) deletePlayListEntryMutate(idPlayListEntry.id);
     }
   };
 
@@ -120,11 +121,7 @@ function SongInPlayList({
       <span className="text-md font-semibold text-myprim-800">
         {playlist.name}
       </span>
-      <input
-        checked={check}
-        type="checkbox"
-        onChange={handleCheckboxChange}
-      />
+      <input checked={check} type="checkbox" onChange={handleCheckboxChange} />
     </div>
   );
 }

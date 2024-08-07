@@ -27,6 +27,7 @@ export function useArtists() {
         getNextPageParam: (lastPage, allPages, lastPageParam) => {
           const nextPage = lastPage.next !== null ? lastPageParam + 1 : undefined 
           return nextPage;
+          void allPages;
         },
         staleTime: Infinity,
         retry: 3

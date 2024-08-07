@@ -11,12 +11,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <SongsProvider>
       <PlaylistProvider>
-      <AuthProvider>
-      <App />
-    </AuthProvider>
-        
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </PlaylistProvider>
-    
     </SongsProvider>
   </QueryClientProvider>
 );

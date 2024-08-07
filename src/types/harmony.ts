@@ -88,7 +88,7 @@ export interface SongsType{
     count: number;
     next: null | string;
     previous: null | string;
-    results : PlayListEntry
+    results : PlayListEntry[]
   }
 
   export interface PlayListEntry {
