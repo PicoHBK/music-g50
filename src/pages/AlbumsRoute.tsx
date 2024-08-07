@@ -67,37 +67,6 @@ function AlbumsRoute() {
   };
   return (
     <div className="flex flex-wrap justify-start items-start gap-5">
-      {/* {albums?.map((album) => (
-          <Dialog key={album.id}>
-          <DialogTrigger className="rounded-lg p-2 flex flex-col items-center" onClick={()=> {setEdit(false); setBorrar(false)}}>
-            <CardAlbum album={album}/>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{album.title}</DialogTitle>
-              <DialogDescription>{album.year}</DialogDescription>
-            </DialogHeader>
-            {(!edit&&!borrar)&&<Songs filterGenRes={"all"} filterAlbum={album.id} filterPlayList={"all"}/>}
-            {!edit ?
-              <div className="flex flex-col gap-2">
-                {(state.user?.user__id === album.owner && !borrar) && <div className="flex gap-2">
-                  <button className="bg-mywarn-500 py-1 px-3 text-mywarn-100 rounded-lg hover:scale-105 transition" onClick={() => setEdit(true)}>Editar</button>
-                  <button className="bg-myerror-500 py-1 px-3 text-myerror-100 rounded-lg hover:scale-105 transition" onClick={() => setBorrar(true)}>Borrar</button>
-                </div>}
-              </div>
-            :<AlbumEdit album={album}/>}
-            {borrar && <div className="flex flex-col gap-2 items-center">
-              <p>Seguro quieres eliminar el album permanentemente?</p>
-              {!loading ? <button 
-              onClick={() => {confirmDeleteAlbum(album.id)}}
-              className="px-6 py-1 bg-myerror-100 text-myerror-400 rounded-lg hover:scale-105 transition active:scale-95">Si</button>:
-              <p>Borrando</p>}
-              </div>}
-
-          </DialogContent>
-        </Dialog>
-          
-        ))} */}
       {albumsPag?.pages.map((page) =>
         page.results.map((album) => (
           <Dialog key={album.id}>
