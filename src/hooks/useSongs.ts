@@ -44,7 +44,7 @@ const fetchSongs = async (ctx: QueryFunctionContext) => {
   const typedFilters: UseSongsArgsType = filters as UseSongsArgsType;
   const url = buildUrl(typedFilters, pageNum as number);
 
-  const { data } = await apiHarmSongPublic.get<PagSongType>(url+"&page_size=30");
+  const { data } = await apiHarmSongPublic.get<PagSongType>(url+"&page_size=20");
   return data;
 };
 
