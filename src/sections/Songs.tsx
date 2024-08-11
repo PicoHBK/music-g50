@@ -166,7 +166,7 @@ function Songs({ filters = {} }: { filters: UseSongsArgsType }) {
                         </div>
                       </PopoverTrigger>
                       <PopoverContent>
-                        <PlayListEntrys id={song.id} />
+                        <PlayListEntrys idSong={song.id} id={state.user?.user__id||1} />
                       </PopoverContent>
                     </Popover>
                   </td>

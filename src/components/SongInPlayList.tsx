@@ -51,7 +51,9 @@ function SongInPlayList({
     onSuccess: (data) => {
       console.log("Canción añadida a la playlist");
       console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({
+        queryKey: ["playlists-infiity", "playlist-entries", "songs", "playlistsById","playlists"],
+      });
       // Realiza alguna acción cuando la canción se añada a la playlist
     },
     onError: (error) => {
@@ -64,7 +66,7 @@ function SongInPlayList({
     onSuccess: (data) => {
       console.log("Canción quitada de la playlist");
       console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({ queryKey: ["playlists", "playlist-entries", "songs", "playlistsById","playlists-infiity"] });
       // Realiza alguna acción cuando la canción se añada a la playlist
     },
     onError: (error) => {
@@ -89,6 +91,9 @@ function SongInPlayList({
 
   const handleCheckboxChange = () => {
     const isInPlaylist = playlist.entries.includes(idSong);
+    console.log(playlist)
+    console.log(idSong)
+    console.log(isInPlaylist)
     setCheck((prevCheck) => !prevCheck);
 
     if (!isInPlaylist) {

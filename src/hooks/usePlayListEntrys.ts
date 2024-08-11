@@ -3,7 +3,7 @@ import { PagPlayListEntry} from "@/types/harmony";
 import { useQuery } from "@tanstack/react-query";
 
 const fetchPlayListEntries = async () => {
-    const { data } = await apiHarmSongPublic.get<PagPlayListEntry>(`/playlist-entries`);
+    const { data } = await apiHarmSongPublic.get<PagPlayListEntry>(`/playlist-entries?page_size=200`);
     return data;
   };
   

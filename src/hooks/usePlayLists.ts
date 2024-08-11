@@ -29,7 +29,7 @@ export function usePlaylists() {
       console.log(allPages.fill)
       return nextPage;
     },
-    staleTime: Infinity,
+    staleTime: 1000,
     retry: 3
   });
     const { data } = useQuery({
